@@ -102,7 +102,7 @@ class SegmentationDataset(utils.Dataset):
                   class_map=None, return_coco=False, auto_download=False):
 
         # Add classes. We have only one class to add.
-        self.add_class("custom_dataset", 1, "object")
+        self.add_class("line", 1, "line")
 
         # Train or validation dataset?
         assert subset in ["train", "val"]
@@ -112,9 +112,10 @@ class SegmentationDataset(utils.Dataset):
         annotations_dir = os.path.join(dataset_dir, "annotations")
         image_dir = os.path.join(dataset_dir, "images")
 
-        polygons = []
-        
-        for filename in os.listdir(annotations_dir):
+        files = os.listdir(annotations_dir)
+
+        for filename in files:
+            polygons = []
 
             if filename.endswith(".xml"):
 
@@ -142,10 +143,6 @@ class SegmentationDataset(utils.Dataset):
 
                     polygons.append(shape_attributes)
 
-                # Parse the XML file
-                #print(filename)
-
-                xml_path = os.path.join(annotations_dir, filename)
 
                 # Get image file path
                 image_filename = filename.split(".")[0] + ".jpg"
@@ -156,15 +153,13 @@ class SegmentationDataset(utils.Dataset):
                 # Add image to dataset
                 image_id = filename.split(".")[0]
 
+
                 self.add_image(
-                    "custom_dataset", 
-                    image_id=image_id, 
+                    "line", 
+                    image_id=image_filename, 
                     path=image_path,
                     width=width, height=height,
                     polygons=polygons)
-
-                break
-
 
 
     def load_mask(self, image_id):
@@ -173,12 +168,20 @@ class SegmentationDataset(utils.Dataset):
         # [height, width, instance_count]
         info = self.image_info[image_id]
 
+        #print(len(info["polygons"]))
+        #print(self.image_info[image_id])
+
+        #print(info)
+        #print(len(info))
+        #print(len(info["polygons"]))
+
         mask = np.zeros([info["height"], info["width"], len(info["polygons"])],
                         dtype=np.uint8)
         
+
         for i, p in enumerate(info["polygons"]):
             # Get indexes of pixels inside the polygon and set them to 1
-            rr, cc = skimage.draw.polygon(np.array(p['all_points_y']), np.array(p['all_points_x']))
+            rr, cc = skimage.draw.polygon(p['all_points_y'], p['all_points_x'])
             mask[rr, cc, i] = 1
 
         # Return mask, and array of class IDs of each instance. Since we have
