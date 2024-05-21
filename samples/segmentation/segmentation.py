@@ -105,7 +105,7 @@ class SegmentationDataset(utils.Dataset):
         self.add_class("line", 1, "line")
 
         # Train or validation dataset?
-        assert subset in ["train", "val"]
+        assert subset in ["train", "val", "test"]
         dataset_dir = os.path.join(dataset_dir, subset)
 
         # Load annotations from PAGE XML files
