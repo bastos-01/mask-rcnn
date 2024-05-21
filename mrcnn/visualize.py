@@ -34,7 +34,7 @@ from mrcnn import utils
 ############################################################
 
 def display_images(images, titles=None, cols=4, cmap=None, norm=None,
-                   interpolation=None):
+                   interpolation=None, image_id=None):
     """Display the given set of images, optionally with titles.
     images: list or array of image tensors in HWC format.
     titles: optional. A list of titles to display with each image.
@@ -54,7 +54,9 @@ def display_images(images, titles=None, cols=4, cmap=None, norm=None,
         plt.imshow(image.astype(np.uint8), cmap=cmap,
                    norm=norm, interpolation=interpolation)
         i += 1
-    plt.show()
+    plt.savefig(str(image_id) + ".png", bbox_inches='tight')
+    #plt.show()
+    
 
 
 def random_colors(N, bright=True):
@@ -86,7 +88,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                       figsize=(16, 16), figAx=None,
                       show_mask=True, show_bbox=True,
                       show_caption=True,
-                      colors=None, captions=None):
+                      colors=None, captions=None, image_id=None):
     """
     boxes: [num_instance, (y1, x1, y2, x2, class_id)] in image coordinates.
     masks: [height, width, num_instances]
@@ -171,7 +173,8 @@ def display_instances(image, boxes, masks, class_ids, class_names,
             ax.add_patch(p)
     ax.imshow(masked_image.astype(np.uint8))
     if auto_show:
-        plt.show()
+        plt.savefig(image_id, bbox_inches='tight')
+        #plt.show()
 
 def display_differences(image,
                         gt_box, gt_class_id, gt_mask,
